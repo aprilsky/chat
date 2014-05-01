@@ -1,0 +1,126 @@
+[[set . "title" "聊天室"]]
+[[template "header.html" .]]
+
+<script type="text/template" id="login-template">
+    <form class="form-horizontal" id="login_form" action="enter" method="post">
+	
+		<div class="control-group">
+		<label class="control-label" for="inputEmail">连接方式</label>
+			<div class="controls">
+	             <select class="form-control" name="agaent" id="agaent">
+				    <option value="refresh">refresh</option>
+				    <option>2</option>
+				    <option>3</option>
+				    <option>4</option>
+				    <option>5</option>
+				</select>
+	        </div>
+        </div>
+		
+
+        <div class="control-group">
+            <label class="control-label" for="inputEmail">邮箱/用户名</label>
+            <div class="controls">
+                <input id="inputEmail"  name="user.Email" type="text" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputPassword">密码</label>
+            <div class="controls">
+                <input id="inputPassword"  name="user.Password" type="password" />
+            </div>
+        </div>
+		
+		[[if .flash.error]]
+			<div class="control-group">
+				<div class="alert alert-error">
+					[[.flash.error]]
+				</div>
+	        </div>
+		[[end]]
+		
+		[[if .flash.success]]
+			<div class="control-group">
+				<div class="alert alert-success">
+					[[.flash.success]]
+				</div>
+	        </div>
+		[[end]]
+		
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" id="login_btn" class="btn">登陆</button>
+                <button type="button" id="register_btn" class="btn">注册</button>
+            </div>
+        </div>
+    </form>
+</script>
+
+
+
+<script type="text/javascript">
+
+
+    function init() {	
+		//document.cookie="userName=ccc;"
+        if (false) {
+		    
+        } else {
+            var compiled = _.template($('#login-template').html());
+			 $('#mainApp').html(compiled());
+        }
+		
+        $('#register_btn').on('click',function(e){
+			location.href="register"
+        })
+		
+		$('li').delegate('.logout-a','click',function(e){
+			var exp = new Date();
+		    exp.setTime(exp.getTime() - 1);
+		    var cval=getCookie('userName');
+		    if(cval!=null) document.cookie="userName="+cval+";expires="+exp.toGMTString();
+		})
+		$('div .span4').delegate('.user-a','click',function(e){
+			e.preventDefault();
+			var _this = $(this);
+			$('#other_name').html(_this.attr('data-name'));
+			
+			var compiled = _.template($('#message-template').html());
+			$('#message_record').html(compiled())
+		}) 
+		
+		
+       
+
+    }
+    
+    $(function(){
+        init();
+		var validate = $("#login_form").validate({
+          errorClass: "label_error", //默认为错误的样式类为：error   
+          onkeyup: false,        
+          rules:{
+              
+              'user.Email':{
+				required:true
+              },
+              'user.Password':{
+                  required:true,
+                  rangelength:[3,10]
+              }                 
+          },
+          messages:{
+              'user.Email':{
+                  required:"邮箱/用户名必填"
+              },
+              'user.Password':{
+                  required: "密码不能为空",
+                  rangelength: $.format("密码最小长度:{0}, 最大长度:{1}。")
+              }                           
+          }
+                    
+      });   
+    });
+</script>
+
+[[template "footer.html" .]]

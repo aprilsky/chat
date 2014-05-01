@@ -1,0 +1,87 @@
+[[set . "title" "聊天室-注册"]]
+[[template "header.html" .]]
+
+<script>
+
+$(function(){
+	var compiled = _.template($('#register-template').html());
+	$('#mainApp').html(compiled());
+	var validate = $("#register_form").validate({
+          errorClass: "label_error", //默认为错误的样式类为：error   
+          onkeyup: false,        
+          rules:{
+              'user.NickName':{
+				required:true,
+				remote:"/CheckNickNameNotRepeat" 
+              },
+              'user.Email':{
+				required:true,
+				email:true,
+				remote:"/CheckEmailNotRepeat" 
+              },
+              'user.Password':{
+                  required:true,
+                  rangelength:[3,10]
+              },
+              'user.Repassword':{
+                  equalTo:"#inputPassword"
+              }                    
+          },
+          messages:{
+              'user.NickName':{
+                  required:"昵称必填",
+				 remote:"昵称重复，请重新填写"
+              },
+              'user.Email':{
+                  required:"E-Mail必填",
+                  email:"E-Mail格式不正确",
+				remote:"E-Mail重复，请重新填写"
+              },
+              'user.Password':{
+                  required: "密码不能为空",
+                  rangelength: $.format("密码最小长度:{0}, 最大长度:{1}。")
+              },
+              'user.Repassword':{
+                  equalTo:"两次密码输入不一致"
+              }                                    
+          }
+                    
+      });   
+	
+})
+</script>
+<script type="text/template" id="register-template">
+    <form class="form-horizontal" id="register_form" action="register" method="post">
+        <div class="control-group">
+            <label class="control-label" for="nickName">昵称</label>
+            <div class="controls">
+                <input id="nickName"  name="user.NickName" type="text" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputEmail">邮箱</label>
+            <div class="controls">
+                <input id="inputEmail"  name="user.Email" type="text" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputPassword">密码</label>
+            <div class="controls">
+                <input id="inputPassword"  name="user.Password" type="password" />
+            </div>
+        </div>
+        <div class="control-group">
+            <label class="control-label" for="inputRepeatPassword">重复密码</label>
+            <div class="controls">
+                <input id="inputRepeatPassword"   name="user.Repassword" type="password" />
+            </div>
+        </div>
+        <div class="control-group">
+            <div class="controls">
+                <button type="submit" id="save_btn" class="btn">保存</button>
+                <button type="reset" id="reset_btn" class="btn">重置</button>
+            </div>
+        </div>
+    </form>
+</script>
+[[template "footer.html" .]]

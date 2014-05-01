@@ -1,0 +1,91 @@
+[[set . "title" "聊天室"]]
+[[template "header.html" .]]
+
+<script type="text/template" id="message-template">
+	<% _.each(ChatLogs, function(log) { %>
+            <li>
+             <%=log.FromUserName%><span style="margin-left:80px"><% print(new Date(1398153521579)); %></span>
+         	</li>
+			<li style="color:grey">
+             <%=log.MsgContent%>
+        	 </li>
+	 <% }); %>
+</script>
+<script type="text/template" id="root-template">
+    <div class="span4">
+        <ol id="listFriend">
+		<% _.each(Users, function(user) { %>
+            <li>
+				<%if(user.Id ==[[.userO.Id]]){%>
+				youself
+				<%}else{%>
+                <a href="javascript:void(0)" class="user-a" data-id=<%=user.Id%> data-name=<%=user.NickName%>><%=user.NickName%></a>
+            	<%}%>
+			</li>
+	   <% }); %>
+        </ol>
+    </div>
+	<div class="span8" id="msg_tip">
+		<em>请选择</em>
+	</div>
+    <div class="span8 hide" id="msg_div">
+        <div class="row-fluid">
+            <div class="span12 control-group">
+                <form class="form-horizontal" id="msg_form" method="post">
+				<input type="hidden" id="fromUserId" name="chatLog.FromUserId" value=""/>
+				<input type="hidden" id="fromUserName" name="chatLog.FromUserName" />
+				<input type="hidden" id="toUserId" name="chatLog.ToUserId" />
+				<input type="hidden" id="toUserName" name="chatLog.ToUserName" />
+                    <legend><span id="my_name">用户名</span>---><span id="other_name">朋友</span></legend>
+                    <label>发消息</label>
+                    <textarea class="form-control" id="message" name="chatLog.MsgContent" autofocus style="width: 80%" rows="3"></textarea>
+                    <div><button type="button" id="send_btn" class="btn" >发送</button></div>
+                </form>
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div class="span12">
+                <ul id="message_record" class="list-unstyled">
+                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</script>
+
+
+
+<script type="text/javascript" charset="utf-8">
+$(function(){
+	var t = _.template($('#root-template').html(),{Users: [[.OnlineList]]})
+	$('#mainApp').html(t);
+	$('#my_name').html('[[.userO.NickName]]');
+	$('#listFriend .user-a').on('click',function(e){
+		//
+		var this_ = $(this)
+		$('#other_name').html(this_.attr('data-name'));
+		$('#msg_div').removeClass("hide")
+		$('#msg_tip').addClass("hide")
+		
+		$('#fromUserId').val('[[.userO.Id]]');
+		$('#fromUserName').val('[[.userO.NickName]]');
+		
+		$('#toUserId').val(this_.attr('data-id'));
+		$('#toUserName').val(this_.attr('data-name'));
+		//
+		loadChatLog(this_.attr('data-id'))
+	})
+	$('#send_btn').on('click',function(e){
+		$.post('/sendMessage',$('#msg_form').serialize(),function(e){
+			loadChatLog($('#toUserId').val())
+		})
+	})
+})
+function loadChatLog(toUserId){
+	$.get('/getUserChatLog',{'fromUserId':'[[.userO.Id]]','toUserId':toUserId},function(data){
+		var m = _.template($('#message-template').html(),{ChatLogs:data})
+		$('#message_record').html(m);
+	})
+}
+</script>
+[[template "footer.html" .]]
